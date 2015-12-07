@@ -1,0 +1,3 @@
+six
+git+git://github.com/okfn/datapackage-py.git
+# git+git://github.com/roll/jsontableschema-biqquery-py.git
