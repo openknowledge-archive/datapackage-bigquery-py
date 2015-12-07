@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 
 import unittest
 from importlib import import_module
-module = import_module('tdpbq.service')
+module = import_module('dpbq.service')
 
 
 # TODO: implement

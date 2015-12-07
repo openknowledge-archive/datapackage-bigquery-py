@@ -1,12 +1,12 @@
 {
 
-  "name": "tdpbq",
-  "description": "Generate BigQuery tables, load and extract data, based on Tabular Data Package.",
+  "name": "dpbq",
+  "description": "Generate BigQuery tables, load and extract data, based on Data Package.",
   "version": "0.1.0-alpha",
-  "slug": "tdpbq",
+  "slug": "dpbq",
   "author": "Open Knowledge Foundation",
   "author_email": "info@okfn.org",
-  "repository": "https://github.com/okfn/tabulardatapackage-bigquery-py",
+  "repository": "https://github.com/okfn/datapackage-bigquery-py",
   "license": "MIT",
   "keywords": "frictionless data",
   "classifiers": [
@@ -26,8 +26,8 @@
 
   "scripts": {
     "check": "python run.py review && python run.py test",
-    "review": "pylama tdpbq",
-    "test": "nosetests tests -sv --with-coverage --cover-package tdpbq"
+    "review": "pylama dpbq",
+    "test": "nosetests tests -sv --with-coverage --cover-package dpbq"
   }
 
 }

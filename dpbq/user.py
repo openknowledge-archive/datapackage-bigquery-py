@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 
 
 class UserTable(object):
-    """Tabular Data Package table representation.
+    """Data Package table representation.
     """
 
     pass
