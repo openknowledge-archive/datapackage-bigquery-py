@@ -5,17 +5,16 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import os
-from jtsbq import ServiceTable
+from dpbq import Package
 
 
 # Credentials
 client_email = os.environ['GOOGLE_CLIENT_EMAIL']
 private_key = os.environ['GOOGLE_PRIVATE_KEY']
 
-table = ServiceTable(
+package = Package('examples/data/spending/datapackage.json')
+package.upload(
         client_email= client_email,
         private_key=private_key,
-        project_id='jsontableschema-bigquery-py',
-        dataset_id='test',
-        table_id='test')
-table.download('tmp')
+        project_id='frictionless-data-roll',
+        dataset_id='datapackage')

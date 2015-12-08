@@ -6,13 +6,13 @@ from __future__ import unicode_literals
 
 import unittest
 from importlib import import_module
-module = import_module('dpbq.user')
+module = import_module('dpbq.package')
 
 
 # TODO: implement
-class UserTableTest(unittest.TestCase):
+class PackageTest(unittest.TestCase):
 
     # Tests
 
     def test(self):
-        self.assertTrue(module.UserTable)
+        self.assertTrue(module.Package)
