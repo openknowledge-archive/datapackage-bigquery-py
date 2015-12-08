@@ -13,7 +13,7 @@ This section is intended to be used by end-users of the library.
 
 Upload Data Package to Big Query:
 
-```
+```python
 from dpbq import Package
 
 package = Package('examples/data/spending/datapackage.json')
@@ -32,6 +32,15 @@ To start using Google BigQuery service:
 - Add environment variables extracted from previous step json:
     - GOOGLE_CLIENT_EMAIL
     - GOOGLE_PRIVATE_KEY (for bash `export VAR=$'...'` to no not escape newlines)
+
+Then you can use environment variables to get `client_email` and `private_key`:
+
+```python
+import os
+
+client_email = os.environ['GOOGLE_CLIENT_EMAIL']
+private_key = os.environ['GOOGLE_PRIVATE_KEY']
+```
 
 ## Development
 
