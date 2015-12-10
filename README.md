@@ -9,19 +9,24 @@ Generate and load BigQuery tables based on Data Package.
 
 This section is intended to be used by end-users of the library.
 
-> See section below how to get credentials.
+> See section below how to get authentificated service.
 
-Upload Data Package to Big Query:
+Package represents Data Package stored as Big Query dataset:
 
 ```python
 from dpbq import Package
 
-package = Package('examples/data/spending/datapackage.json')
-package.upload(
-        client_email= client_email,
-        private_key=private_key,
-        project_id='frictionless-data-roll',
-        dataset_id='datapackage')
+package = Package(<service>, 'project_id', 'dataset_id')
+package.export()
+```
+
+Dataset represents a native Big Query dataset:
+
+```python
+from dpbq import Dataset
+
+dataset = Dataset(<service>, 'project_id', 'dataset_id')
+dataset.get_tables()
 ```
 
 ### Authentification
