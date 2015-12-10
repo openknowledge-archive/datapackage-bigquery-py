@@ -17,6 +17,7 @@ Package represents Data Package stored as Big Query dataset:
 from dpbq import Package
 
 package = Package(<service>, 'project_id', 'dataset_id')
+package.get_resources()
 package.export()
 ```
 
