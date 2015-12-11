@@ -1,12 +1,12 @@
 -r requirements.txt
-pycrypto
 pylama
-nose
+tox
 mock
+pytest
+pytest-cov
 coverage
 coveralls
+pycrypto
 
 # jtsbq
-pycrypto
-google-api-python-client
 git+git://github.com/okfn/tabulator-py.git
