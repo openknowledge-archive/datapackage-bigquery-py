@@ -58,6 +58,22 @@ class Package(object):
 
         return self.__dataset.is_existent
 
+    def create(self):
+        pass
+
+    def delete(self):
+        """Delete package (underlaying dataset).
+
+        Raises
+        ------
+        RuntimeError
+            If package (underlaying dataset) is not existent.
+
+        """
+
+        # Delete table
+        self.__dataset.delete()
+
     def get_resources(self, plain=False):
         """Return dataset resources.
         """
