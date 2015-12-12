@@ -51,6 +51,13 @@ class Package(object):
     def dataset(self):
         return self.__dataset
 
+    @property
+    def is_existent(self):
+        """Return if packages (underlaying dataset) is existent.
+        """
+
+        return self.__dataset.is_existent
+
     def get_resources(self, plain=False):
         """Return dataset resources.
         """

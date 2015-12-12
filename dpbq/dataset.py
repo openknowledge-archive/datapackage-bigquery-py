@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import jtsbq
+from apiclient.errors import HttpError
 
 
 # Module API
@@ -46,6 +47,71 @@ class Dataset(object):
     @property
     def dataset_id(self):
         return self.__dataset_id
+
+    @property
+    def is_existent(self):
+        """Return dataset is existent.
+        """
+
+        # If tables
+        try:
+            # TODO: use other call?
+            self.get_tables()
+            return True
+
+        # No dataset
+        except HttpError as error:
+            if error.resp.status != 404:
+                raise
+            return False
+
+    def create(self):
+        """Create dataset.
+
+        Raises
+        ------
+        RuntimeError
+            If dataset is already existent.
+
+        """
+
+        # Check not existent
+        if self.is_existent:
+            message = 'Dataset "%s" is already existent.' % self
+            raise RuntimeError(message)
+
+        # Prepare job body
+        body = {
+            'datasetReference': {
+                'projectId': self.__project_id,
+                'datasetId': self.__dataset_id,
+            },
+        }
+
+        # Make request
+        self.__service.datasets().insert(
+                projectId=self.__project_id,
+                body=body).execute()
+
+    def delete(self):
+        """Delete dataset.
+
+        Raises
+        ------
+        RuntimeError
+            If dataset is not existent.
+
+        """
+
+        # Check existent
+        if not self.is_existent:
+            message = 'Dataset "%s" is not existent.' % self
+            raise RuntimeError(message)
+
+        # Make request
+        self.__service.datasets().delete(
+                projectId=self.__project_id,
+                datasetId=self.__dataset_id).execute()
 
     def get_tables(self, plain=False):
         """Return names of all dataset's tables.
