@@ -18,24 +18,33 @@ from .dataset import Dataset
 # Module API
 
 class Package(object):
+    """Data Package as BigQuery dataset represesntation.
+
+    Parameters
+    ----------
+    service: object
+        Authentificated BigQuery service.
+    project_id: str
+        BigQuery project identifier.
+    dataset_id: str
+        BigQuery dataset identifier.
+
+    """
 
     # Public
 
-    def __init__(self, service, project_id, dataset_id, descriptor=None):
+    def __init__(self, service, project_id, dataset_id):
 
         # Set attributes
         self.__service = service
         self.__project_id = project_id
         self.__dataset_id = dataset_id
-        self.__descriptor = descriptor
 
         # Create dataset
         self.__dataset = Dataset(
                 service=service,
                 project_id=project_id,
                 dataset_id=dataset_id)
-
-        # TODO: ensure created
 
     def __repr__(self):
 
@@ -49,6 +58,9 @@ class Package(object):
 
     @property
     def dataset(self):
+        """Return underlaying dataset.
+        """
+
         return self.__dataset
 
     @property
@@ -110,6 +122,12 @@ class Package(object):
 
     def get_resources(self, plain=False):
         """Return dataset resources.
+
+        Parameters
+        ----------
+        plain: bool
+            Return names if True otherwise return Dataset instances.
+
         """
 
         # Collect resources
@@ -127,7 +145,13 @@ class Package(object):
         return resources
 
     def export(self, path):
-        """Export package by descriptor path.
+        """Export package using descriptor path.
+
+        Parameters
+        ----------
+        path: str
+            Path where to store `datapackage.json`.
+
         """
 
         # Iterate over resources

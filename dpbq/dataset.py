@@ -12,6 +12,16 @@ from apiclient.errors import HttpError
 
 class Dataset(object):
     """BigQuery native dataset representation.
+
+    Parameters
+    ----------
+    service: object
+        Authentificated BigQuery service.
+    project_id: str
+        BigQuery project identifier.
+    dataset_id: str
+        BigQuery dataset identifier.
+
     """
 
     # Public
@@ -22,7 +32,6 @@ class Dataset(object):
         self.__service = service
         self.__project_id = project_id
         self.__dataset_id = dataset_id
-        # TODO: ensure existent
 
     def __repr__(self):
 
@@ -38,19 +47,28 @@ class Dataset(object):
 
     @property
     def service(self):
+        """Return BigQuery service instance.
+        """
+
         return self.__service
 
     @property
     def project_id(self):
+        """Return BigQuery project identifier.
+        """
+
         return self.__project_id
 
     @property
     def dataset_id(self):
+        """Return BigQuery dataset identifier.
+        """
+
         return self.__dataset_id
 
     @property
     def is_existent(self):
-        """Return dataset is existent.
+        """Return dataset if is existent.
         """
 
         # If tables
@@ -114,7 +132,13 @@ class Dataset(object):
                 datasetId=self.__dataset_id).execute()
 
     def get_tables(self, plain=False):
-        """Return names of all dataset's tables.
+        """Return dataset's tables.
+
+        Parameters
+        ----------
+        plain: bool
+            Return names if True otherwise return Table instances.
+
         """
 
         # Get response
