@@ -20,7 +20,11 @@ credentials = SignedJwtAssertionCredentials(client_email, private_key, scope)
 service = build('bigquery', 'v2', credentials=credentials)
 
 # Dataset
-package = Package(service, 'frictionless-data-test', 'jsontableschema')
+package = Package(service, 'frictionless-data-test', 'spending')
+
 print(package)
+# package.create('examples/data/spending/datapackage.json')
+print(package)
+
 print(package.get_resources())
 package.export('tmp/datapackage.json')

@@ -124,7 +124,7 @@ class Dataset(object):
 
         # Extract tables
         tables = []
-        for table in response['tables']:
+        for table in response.get('tables', []):
             table = table['id'].rsplit('.', 1)[1]
             if not plain:
                 table = jtsbq.Table(

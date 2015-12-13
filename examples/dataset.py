@@ -24,3 +24,7 @@ dataset = Dataset(service, 'frictionless-data-test', 'jsontableschema')
 print(dataset)
 tables = dataset.get_tables()
 print(tables)
+
+# Create dataset
+dataset = Dataset(service, 'frictionless-data-test', 'test')
+dataset.create()

@@ -58,8 +58,42 @@ class Package(object):
 
         return self.__dataset.is_existent
 
-    def create(self):
-        pass
+    def create(self, descriptor):
+        """Create resource by Data Package descriptor.
+
+        Raises
+        ------
+        RuntimeError
+            If package (underlaying dataset) is already existent.
+
+        """
+
+        # Get model
+        model = DataPackage(descriptor)
+
+        # Create dataset
+        self.__dataset.create()
+
+        # Create resources
+        for resource in model.resources:
+
+            # Prepare metadata
+            path = resource.local_data_path
+            schema = resource.metadata['schema']
+            table_id = path_module.package2dataset(resource.metadata['path'])
+
+            # Initiate remote resource
+            resource = jtsbq.Resource(
+                   service=self.__service,
+                   project_id=self.__project_id,
+                   dataset_id=self.__dataset_id,
+                   table_id=table_id)
+
+            # Create resource
+            resource.create(schema)
+
+            # Import data
+            resource.import_data(path)
 
     def delete(self):
         """Delete package (underlaying dataset).
@@ -93,7 +127,7 @@ class Package(object):
         return resources
 
     def export(self, path):
-        """Export package to descriptor path.
+        """Export package by descriptor path.
         """
 
         # Iterate over resources
@@ -117,30 +151,6 @@ class Package(object):
             json.dump(descriptor, file, indent=4)
 
     # Private
-
-    def __create(self):
-
-        # Get model
-        model = DataPackage(self.__descriptor)
-
-        # Iterate over resources
-        for resource in model.resources:
-
-            # Prepare metadata
-            path = resource.local_data_path
-            schema = resource.metadata['schema']
-            table_id = path_module.resource2dataset(resource.metadata['path'])
-
-            # Create remote resource
-            resource = jtsbq.Resource(
-                   service=self.__service,
-                   project_id=self.__project_id,
-                   dataset_id=self.__dataset_id,
-                   table_id=table_id,
-                   schema=schema)
-
-            # Import data
-            resource.import_data(path)
 
     @property
     def __write_mode(self):
