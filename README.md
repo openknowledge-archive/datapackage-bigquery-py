@@ -17,8 +17,10 @@ Package represents Data Package stored as Big Query dataset:
 from dpbq import Package
 
 package = Package(<service>, 'project_id', 'dataset_id')
+
 package.create('path/to/descriptor.json')
 package.get_resources()
+
 package.export('path/to/descriptor.json')
 ```
 
@@ -28,6 +30,7 @@ Dataset represents a native Big Query dataset:
 from dpbq import Dataset
 
 dataset = Dataset(<service>, 'project_id', 'dataset_id')
+
 dataset.create()
 dataset.get_tables()
 ```
@@ -49,6 +52,39 @@ import os
 client_email = os.environ['GOOGLE_CLIENT_EMAIL']
 private_key = os.environ['GOOGLE_PRIVATE_KEY']
 ```
+### Design Overview
+
+#### Entities
+
+- Dataset
+
+    Table is a native BigQuery dataset. Dataset can contain tables.
+
+- Package
+
+    Package is a Data Package stored as Dataset on BigQuery. Resources
+    are stored as tables with directory separator `/` replaced by `__`.
+    Data Package structure can be restored from BigQuery dataset without
+    any knowledge about initial `datapackage.json`.
+
+> Package is a Data Package facade to Dataset (BigQuery) backend.
+
+Dataset and Package are geteways by their nature. It means user can initiate
+Dataset without real BigQuery dataset creation then call `create` or `delete` to
+delete the real datable without instance destruction.
+
+#### Mappings
+
+```
+datapackage.json -> *not stored*
+datapackage.json resources -> BigQuery dataset's tables
+data/data.csv schema -> BigQuery talbe schema
+data/data.csv data -> BigQuery talbe data
+```
+
+#### Drivers
+
+Default Google BigQuery client is used - [docs](https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/python/latest/) as part of `jsontableschema-bigquery-py` package.
 
 ## Development
 
