@@ -1,6 +1,7 @@
 {
     "resources": [
         {
+            "path": "data/data1.csv",
             "schema": {
                 "fields": [
                     {
@@ -24,34 +25,25 @@
                         "name": "amount"
                     }
                 ]
-            },
-            "path": "data/data.csv",
-            "currency": "USD",
-            "name": "data_valid",
-            "granularity": "aggregated"
+            }
+        },
+        {
+            "path": "data/data2.csv",
+            "schema": {
+                "fields": [
+                    {
+                        "format": "default",
+                        "type": "integer",
+                        "name": "id"
+                    },
+                    {
+                        "format": "default",
+                        "type": "string",
+                        "name": "name"
+                    }
+                ]
+            }
         }
     ],
-    "name": "my-new-thing",
-    "owner": "user1",
-    "title": "title",
-    "mapping": {
-        "measures": [
-            {
-                "name": "name",
-                "source": "source",
-                "currency": "USD"
-            }
-        ],
-        "dimensions": [
-            {
-                "name": "name"
-            }
-        ]
-    },
-    "openspending": {
-        "mapping": {
-            "amount": "amount",
-            "id": "id"
-        }
-    }
+    "name": "spending"
 }

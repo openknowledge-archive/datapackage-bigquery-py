@@ -17,8 +17,9 @@ Package represents Data Package stored as Big Query dataset:
 from dpbq import Package
 
 package = Package(<service>, 'project_id', 'dataset_id')
+package.create('path/to/descriptor.json')
 package.get_resources()
-package.export()
+package.export('path/to/descriptor.json')
 ```
 
 Dataset represents a native Big Query dataset:
@@ -27,6 +28,7 @@ Dataset represents a native Big Query dataset:
 from dpbq import Dataset
 
 dataset = Dataset(<service>, 'project_id', 'dataset_id')
+dataset.create()
 dataset.get_tables()
 ```
 

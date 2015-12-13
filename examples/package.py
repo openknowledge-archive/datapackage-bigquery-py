@@ -22,9 +22,12 @@ service = build('bigquery', 'v2', credentials=credentials)
 # Dataset
 package = Package(service, 'frictionless-data-test', 'spending')
 
+# Create
 print(package)
-# package.create('examples/data/spending/datapackage.json')
+if not package.is_existent:
+    package.create('examples/data/spending/datapackage.json')
 print(package)
-
 print(package.get_resources())
+
+# Export
 package.export('tmp/datapackage.json')
