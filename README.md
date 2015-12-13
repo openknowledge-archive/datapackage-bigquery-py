@@ -63,7 +63,7 @@ private_key = os.environ['GOOGLE_PRIVATE_KEY']
 - Package
 
     Package is a Data Package stored as Dataset on BigQuery. Resources
-    are stored as tables with directory separator `/` replaced by `__`.
+    are stored as tables with directory separator `/` replaced by `__` (2 underscores).
     Data Package structure can be restored from BigQuery dataset without
     any knowledge about initial `datapackage.json`.
 
@@ -84,7 +84,7 @@ data/data.csv data -> BigQuery talbe data
 
 #### Drivers
 
-Default Google BigQuery client is used - [docs](https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/python/latest/) as part of `jsontableschema-bigquery-py` package.
+Default Google BigQuery client is used as part of `jsontableschema-bigquery-py` package - [docs](https://developers.google.com/resources/api-libraries/documentation/bigquery/v2/python/latest/).
 
 ## Development
 
