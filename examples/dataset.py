@@ -13,6 +13,7 @@ from oauth2client.client import SignedJwtAssertionCredentials
 # Parameters
 client_email = os.environ['GOOGLE_CLIENT_EMAIL']
 private_key = os.environ['GOOGLE_PRIVATE_KEY']
+project_id = os.environ['GOOGLE_PROJECT_ID']
 scope = 'https://www.googleapis.com/auth/bigquery'
 
 # Service
@@ -20,11 +21,17 @@ credentials = SignedJwtAssertionCredentials(client_email, private_key, scope)
 service = build('bigquery', 'v2', credentials=credentials)
 
 # Dataset
-dataset = Dataset(service, 'frictionless-data-test', 'jsontableschema')
-print(dataset)
-tables = dataset.get_tables()
-print(tables)
+dataset = Dataset(service, project_id, 'dataset_test')
 
-# Create dataset
-dataset = Dataset(service, 'frictionless-data-test', 'test')
+# Delete
+print('[Delete]')
+print(dataset.is_existent)
+if dataset.is_existent:
+    dataset.delete()
+print(dataset.is_existent)
+
+# Create
+print('[Create]')
 dataset.create()
+print(dataset.is_existent)
+print(dataset.get_tables())
