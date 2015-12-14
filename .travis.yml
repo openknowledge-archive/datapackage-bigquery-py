@@ -17,6 +17,7 @@ env:
 install:
   - python run.py install
   # Temporary workaround
+  - rm jtsbq
   - git clone https://github.com/okfn/jsontableschema-bigquery-py.git tmp
   - mv tmp/jtsbq jtsbq
 
