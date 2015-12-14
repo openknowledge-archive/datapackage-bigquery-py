@@ -9,10 +9,10 @@ from importlib import import_module
 module = import_module('dpbq.path')
 
 
-# TODO: implement
 class pathTest(unittest.TestCase):
 
     # Tests
 
     def test(self):
-        self.assertTrue(module)
+        self.assertTrue(module.dataset2package)
+        self.assertTrue(module.package2dataset)
