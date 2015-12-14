@@ -35,3 +35,52 @@ class TestDataset(unittest.TestCase):
 
         # Assert values
         assert repr(self.dataset)
+
+    def test_service(self):
+
+        # Assert values
+        assert self.dataset.service == self.service
+
+    def test_project_id(self):
+
+        # Assert values
+        assert self.dataset.project_id == self.project_id
+
+    def test_dataset_id(self):
+
+        # Assert values
+        assert self.dataset.dataset_id == self.dataset_id
+
+    def test_is_existent_true(self):
+
+        # Assert values
+        assert self.dataset.is_existent
+
+    def test_is_existent_false(self):
+
+        # Mocks
+        error = Exception()
+        error.resp = MagicMock(status=404)
+        patch.object(module, 'HttpError', Exception).start()
+        self.service.tables.side_effect = error
+
+        # Assert values
+        assert not self.dataset.is_existent
+
+    def test_is_existent_raise(self):
+
+        # Mocks
+        error = Exception()
+        error.resp = MagicMock(status=500)
+        patch.object(module, 'HttpError', Exception).start()
+        self.service.tables.side_effect = error
+
+        # Assert exception
+        with pytest.raises(module.HttpError):
+           self.dataset.is_existent
+
+    def test_get_tables(self):
+        pass
+
+    def test_get_tables_plain(self):
+        pass
