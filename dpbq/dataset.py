@@ -129,7 +129,8 @@ class Dataset(object):
         # Make request
         self.__service.datasets().delete(
                 projectId=self.__project_id,
-                datasetId=self.__dataset_id).execute()
+                datasetId=self.__dataset_id,
+                deleteContents=True).execute()
 
     def get_tables(self, plain=False):
         """Return dataset's tables.
@@ -149,7 +150,7 @@ class Dataset(object):
         # Extract tables
         tables = []
         for table in response.get('tables', []):
-            table = table['id'].rsplit('.', 1)[1]
+            table = table['tableReference']['tableId']
             if not plain:
                 table = jtsbq.Table(
                         service=self.__service,
