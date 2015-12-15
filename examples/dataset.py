@@ -15,24 +15,32 @@ sys.path.insert(0, '.')
 from dpbq import Dataset
 
 
-# Service
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '.credentials.json'
-credentials = GoogleCredentials.get_application_default()
-service = build('bigquery', 'v2', credentials=credentials)
+def run(dataset_id='dataset_test'):
 
-# Dataset
-project_id = json.load(io.open('.credentials.json', encoding='utf-8'))['project_id']
-dataset = Dataset(service, project_id, 'dataset_test')
+    # Service
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '.credentials.json'
+    credentials = GoogleCredentials.get_application_default()
+    service = build('bigquery', 'v2', credentials=credentials)
 
-# Delete
-print('[Delete]')
-print(dataset.is_existent)
-if dataset.is_existent:
-    dataset.delete()
-print(dataset.is_existent)
+    # Dataset
+    project_id = json.load(io.open('.credentials.json', encoding='utf-8'))['project_id']
+    dataset = Dataset(service, project_id, dataset_id)
 
-# Create
-print('[Create]')
-dataset.create()
-print(dataset.is_existent)
-print(dataset.get_tables())
+    # Delete
+    print('[Delete]')
+    print(dataset.is_existent)
+    if dataset.is_existent:
+        dataset.delete()
+    print(dataset.is_existent)
+
+    # Create
+    print('[Create]')
+    dataset.create()
+    print(dataset.is_existent)
+    print(dataset.get_tables())
+
+    return locals()
+
+
+if __name__ == '__main__':
+    run()

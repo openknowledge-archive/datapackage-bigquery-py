@@ -19,9 +19,7 @@ class PackageTest(unittest.TestCase):
     def setUp(self):
 
         # Fixtures
-        basedir = os.path.join(os.path.dirname(__file__), '..', '..')
-        self.descriptor = os.path.join(basedir,
-                'examples', 'data', 'spending', 'datapackage.json')
+        self.descriptor = 'examples/data/spending/datapackage.json'
 
         # Mocks
         self.addCleanup(patch.stopall)

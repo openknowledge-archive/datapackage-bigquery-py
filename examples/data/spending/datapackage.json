@@ -5,22 +5,18 @@
             "schema": {
                 "fields": [
                     {
-                        "format": "default",
                         "type": "string",
                         "name": "id"
                     },
                     {
-                        "format": "default",
                         "type": "string",
                         "name": "name"
                     },
                     {
-                        "format": "default",
                         "type": "string",
                         "name": "description"
                     },
                     {
-                        "format": "default",
                         "type": "number",
                         "name": "amount"
                     }
@@ -32,18 +28,15 @@
             "schema": {
                 "fields": [
                     {
-                        "format": "default",
                         "type": "integer",
                         "name": "id"
                     },
                     {
-                        "format": "default",
                         "type": "string",
                         "name": "name"
                     }
                 ]
             }
         }
-    ],
-    "name": "spending"
+    ]
 }

@@ -15,30 +15,40 @@ sys.path.insert(0, '.')
 from dpbq import Package
 
 
-# Service
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '.credentials.json'
-credentials = GoogleCredentials.get_application_default()
-service = build('bigquery', 'v2', credentials=credentials)
+def run(import_path='examples/data/spending/datapackage.json',
+        export_path='tmp/datapackage_test',
+        dataset_id='package_test'):
 
-# Dataset
-project_id = json.load(io.open('.credentials.json', encoding='utf-8'))['project_id']
-package = Package(service, project_id, 'package_test')
+    # Service
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '.credentials.json'
+    credentials = GoogleCredentials.get_application_default()
+    service = build('bigquery', 'v2', credentials=credentials)
 
-# Delete
-print('[Delete]')
-print(package.is_existent)
-if package.is_existent:
-    package.delete()
-print(package.is_existent)
+    # Dataset
+    project_id = json.load(io.open('.credentials.json', encoding='utf-8'))['project_id']
+    package = Package(service, project_id, dataset_id)
 
-# Create
-print('[Create]')
-if not package.is_existent:
-    package.create('examples/data/spending/datapackage.json')
-print(package.is_existent)
-print(package.get_resources())
+    # Delete
+    print('[Delete]')
+    print(package.is_existent)
+    if package.is_existent:
+        package.delete()
+    print(package.is_existent)
 
-# Export
-print('[Export]')
-package.export('tmp/datapackage.json')
-print('done')
+    # Create
+    print('[Create]')
+    if not package.is_existent:
+        package.create(import_path)
+    print(package.is_existent)
+    print(package.get_resources())
+
+    # Export
+    print('[Export]')
+    package.export(export_path)
+    print('done')
+
+    return locals()
+
+
+if __name__ == '__main__':
+    run()

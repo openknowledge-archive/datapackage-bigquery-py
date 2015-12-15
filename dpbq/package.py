@@ -158,14 +158,15 @@ class Package(object):
         resources = []
         for resource in self.get_resources():
 
-            # Add resource schema
-            resources.append({'schema': resource.schema})
-
             # Export resource data
             rpath = resource.table.table_id
             rpath = path_module.dataset2package(rpath)
             rpath = os.path.join(os.path.dirname(path), rpath)
             resource.export_data(rpath)
+
+            # Add resource metadata
+            metadata = {'schema': resource.schema, 'path': rpath}
+            resources.append(metadata)
 
         # Write descriptor
         descriptor = {'resources': resources}
