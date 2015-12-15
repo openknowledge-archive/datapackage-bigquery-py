@@ -80,7 +80,30 @@ class TestDataset(unittest.TestCase):
            self.dataset.is_existent
 
     def test_get_tables(self):
-        pass
 
-    def test_get_tables_plain(self):
-        pass
+        # Mocks
+        Table = patch.object(module.jtsbq, 'Table').start()
+        tables = self.service.tables.return_value
+        tables.list.return_value.execute.return_value = {
+            'tables': [
+                {'tableReference': {'tableId': 'table'}}
+            ]
+        }
+
+        # Method call
+        result = self.dataset.get_tables()
+        result_plain = self.dataset.get_tables(plain=True)
+
+        # Asssert values
+        result = [Table.return_value]
+        result_plain == ['table']
+
+        # Assert calls
+        tables.list.assert_called_with(
+            projectId=self.project_id,
+            datasetId=self.dataset_id)
+        Table.assert_called_with(
+            service=self.service,
+            project_id=self.project_id,
+            dataset_id=self.dataset_id,
+            table_id='table')
