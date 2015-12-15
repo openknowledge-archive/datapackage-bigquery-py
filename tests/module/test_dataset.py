@@ -79,6 +79,46 @@ class TestDataset(unittest.TestCase):
         with pytest.raises(module.HttpError):
            self.dataset.is_existent
 
+    def test_create_existent(self):
+
+        # Assert exception
+        with pytest.raises(RuntimeError):
+           self.dataset.create()
+
+    def test_create(self):
+
+        # Mocks
+        patch.object(self.dataset.__class__, 'is_existent', False).start()
+
+        # Method call
+        self.dataset.create()
+
+        # Assert calls
+        # TODO: add body check
+        self.service.datasets.return_value.insert.assert_called_with(
+                projectId=self.project_id,
+                body=ANY)
+
+    def test_delete_non_existent(self):
+
+        # Mocks
+        patch.object(self.dataset.__class__, 'is_existent', False).start()
+
+        # Assert exception
+        with pytest.raises(RuntimeError):
+           self.dataset.delete()
+
+    def test_delete(self):
+
+        # Method call
+        self.dataset.delete()
+
+        # Assert calls
+        self.service.datasets.return_value.delete.assert_called_with(
+                projectId=self.project_id,
+                datasetId=self.dataset_id,
+                deleteContents=True)
+
     def test_get_tables(self):
 
         # Mocks
