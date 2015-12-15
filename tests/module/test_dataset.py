@@ -126,7 +126,7 @@ class TestDataset(unittest.TestCase):
         tables = self.service.tables.return_value
         tables.list.return_value.execute.return_value = {
             'tables': [
-                {'tableReference': {'tableId': 'table'}}
+                {'tableReference': {'tableId': 'name'}}
             ]
         }
 
@@ -136,7 +136,7 @@ class TestDataset(unittest.TestCase):
 
         # Asssert values
         result = [Table.return_value]
-        result_plain == ['table']
+        result_plain == ['name']
 
         # Assert calls
         tables.list.assert_called_with(
@@ -146,4 +146,4 @@ class TestDataset(unittest.TestCase):
             service=self.service,
             project_id=self.project_id,
             dataset_id=self.dataset_id,
-            table_id='table')
+            table_id='name')
