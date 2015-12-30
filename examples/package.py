@@ -30,7 +30,7 @@ def run(import_descriptor='examples/data/spending/datapackage.json',
 
     # Import
     print('[Import]')
-    dpsql.import_package(
+    dpbq.import_package(
            storage=storage,
            descriptor=import_descriptor,
            force=True)
@@ -38,7 +38,7 @@ def run(import_descriptor='examples/data/spending/datapackage.json',
 
     # Export
     print('[Export]')
-    dpsql.export_package(
+    dpbq.export_package(
             storage=storage,
             descriptor=export_descriptor)
     print('exported')

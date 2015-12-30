@@ -6,185 +6,99 @@ from __future__ import unicode_literals
 
 import io
 import os
+import re
 import six
 import json
 import jtsbq
 from datapackage import DataPackage
 
-from . import path as path_module
-from .dataset import Dataset
-
 
 # Module API
 
-class Package(object):
-    """Data Package as BigQuery dataset represesntation.
+def import_package(storage, descriptor, force=False, default_base_path=None):
+    """Import Data Package to storage.
 
     Parameters
     ----------
-    service: object
-        Authentificated BigQuery service.
-    project_id: str
-        BigQuery project identifier.
-    dataset_id: str
-        BigQuery dataset identifier.
+    storage: object
+        Storage object.
+    descriptor: dict/str
+        Data Package descriptor.
+    force: bool
+        Force table rewriting If it already exists.
+    default_base_path: str
+        If descriptor is not a path use it as base path.
 
     """
 
-    # Public
+    # Initiate model
+    model = DataPackage(descriptor, default_base_path=default_base_path)
 
-    def __init__(self, service, project_id, dataset_id):
+    # Create resources
+    for resource in model.resources:
 
-        # Set attributes
-        self.__service = service
-        self.__project_id = project_id
-        self.__dataset_id = dataset_id
+        # Prepare parameters
+        table = _convert_path(resource.metadata['path'])
+        schema = resource.metadata['schema']
+        data = resource.local_data_path
 
-        # Create dataset
-        self.__dataset = Dataset(
-                service=service,
-                project_id=project_id,
-                dataset_id=dataset_id)
+        # Import resource
+        jtsbq.import_resource(storage, table, schema, data, force=force)
 
-    def __repr__(self):
 
-        # Template
-        template = 'Package <dataset: {dataset}>'
+def export_package(storage, descriptor):
+    """Export Data Package from storage.
 
-        # Format
-        text = template.format(dataset=self.__dataset)
+    Parameters
+    ----------
+    storage: object
+        Storage object.
+    descriptor: str
+        Path where to store descriptor.
 
-        return text
+    """
 
-    @property
-    def dataset(self):
-        """Return underlaying dataset.
-        """
+    # Iterate over tables
+    resources = []
+    for table in storage.tables:
 
-        return self.__dataset
+        # Export resource data
+        schema = {}
+        data = _restore_path(table)
+        data = os.path.join(os.path.dirname(descriptor), data)
+        jtsbq.export_resource(storage, table, schema, data)
 
-    @property
-    def is_existent(self):
-        """Return if packages (underlaying dataset) is existent.
-        """
+        # Add resource metadata
+        metadata = {'schema': schema, 'path': data}
+        resources.append(metadata)
 
-        return self.__dataset.is_existent
-
-    def create(self, descriptor):
-        """Create resource by Data Package descriptor.
-
-        Raises
-        ------
-        RuntimeError
-            If package (underlaying dataset) is already existent.
-
-        """
-
-        # Get model
-        model = DataPackage(descriptor)
-
-        # Create dataset
-        self.__dataset.create()
-
-        # Create resources
-        for resource in model.resources:
-
-            # Prepare metadata
-            path = resource.local_data_path
-            schema = resource.metadata['schema']
-            table_id = path_module.package2dataset(resource.metadata['path'])
-
-            # Initiate remote resource
-            resource = jtsbq.Resource(
-                   service=self.__service,
-                   project_id=self.__project_id,
-                   dataset_id=self.__dataset_id,
-                   table_id=table_id)
-
-            # Create resource
-            resource.create(schema)
-
-            # Import data
-            resource.import_data(path)
-
-    def delete(self):
-        """Delete package (underlaying dataset).
-
-        Raises
-        ------
-        RuntimeError
-            If package (underlaying dataset) is not existent.
-
-        """
-
-        # Delete table
-        self.__dataset.delete()
-
-    def get_resources(self, plain=False):
-        """Return dataset resources.
-
-        Parameters
-        ----------
-        plain: bool
-            Return names if True otherwise return Dataset instances.
-
-        """
-
-        # Collect resources
-        resources = []
-        for table in self.__dataset.get_tables(plain=True):
-            resource = table
-            if not plain:
-                resource = jtsbq.Resource(
-                        service=self.__service,
-                        project_id=self.__project_id,
-                        dataset_id=self.__dataset_id,
-                        table_id=table)
-            resources.append(resource)
-
-        return resources
-
-    def export(self, path):
-        """Export package using descriptor path.
-
-        Parameters
-        ----------
-        path: str
-            Path where to store `datapackage.json`.
-
-        """
-
-        # Iterate over resources
-        resources = []
-        for resource in self.get_resources():
-
-            # Export resource data
-            rpath = resource.table.table_id
-            rpath = path_module.dataset2package(rpath)
-            rpath = os.path.join(os.path.dirname(path), rpath)
-            resource.export_data(rpath)
-
-            # Add resource metadata
-            metadata = {'schema': resource.schema, 'path': rpath}
-            resources.append(metadata)
-
-        # Write descriptor
+    # Write descriptor
+    with io.open(descriptor,
+                 mode=_write_mode,
+                 encoding=_write_encoding) as file:
         descriptor = {'resources': resources}
-        with io.open(path,
-                     mode=self.__write_mode,
-                     encoding=self.__write_encoding) as file:
-            json.dump(descriptor, file, indent=4)
+        json.dump(descriptor, file, indent=4)
 
-    # Private
 
-    @property
-    def __write_mode(self):
-        if six.PY2:
-            return 'wb'
-        return 'w'
+# Internal
 
-    @property
-    def __write_encoding(self):
-        if six.PY2:
-            return None
-        return 'utf-8'
+_write_mode = 'w'
+if six.PY2:
+    _write_mode = 'wb'
+
+_write_encoding = 'utf-8'
+if six.PY2:
+    _write_encoding = None
+
+
+def _convert_path(path):
+    table = os.path.splitext(path)[0]
+    table = path.replace(os.path.sep, '__')
+    table = re.sub('[^0-9a-zA-Z_]+', '_', path)
+    return table
+
+
+def _restore_path(table):
+    path = table.replace('__', os.path.sep)
+    path += '.csv'
+    return path
