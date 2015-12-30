@@ -1,6 +1,7 @@
 six
-google-api-python-client
-git+git://github.com/okfn/datapackage-py.git
 
-# jtsbq
-# git+git://github.com/roll/jsontableschema-biqquery-py.git
+# before tabulator on pypi
+git+git://github.com/okfn/tabulator-py.git
+
+git+git://github.com/okfn/datapackage-py.git
+git+https://github.com/okfn/jsontableschema-bigquery-py.git

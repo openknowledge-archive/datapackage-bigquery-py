@@ -6,6 +6,3 @@ pytest
 pytest-cov
 coverage
 coveralls
-
-# jtsbq
-git+git://github.com/okfn/tabulator-py.git
