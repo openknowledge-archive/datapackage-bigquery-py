@@ -9,79 +9,64 @@ Generate and load BigQuery tables based on Data Package.
 
 This section is intended to be used by end-users of the library.
 
-> See section below how to get authentificated service.
+### Import/Export
 
-Package represents Data Package stored as Big Query dataset:
+> See section below how to get tabular storage object.
 
-```python
-from dpbq import Package
+High-level API is easy to use.
 
-package = Package(<service>, 'project_id', 'dataset_id')
-
-package.create('path/to/descriptor.json')
-package.get_resources()
-
-package.export('path/to/descriptor.json')
-```
-
-Dataset represents a native Big Query dataset:
+Having Data Package in current directory we can import it to bigquery database:
 
 ```python
-from dpbq import Dataset
+import dpbq
 
-dataset = Dataset(<service>, 'project_id', 'dataset_id')
-
-dataset.create()
-dataset.get_tables()
+dpbq.import_package(<storage>, 'descriptor.json')
 ```
 
-### Authentificated service
+Also we can export it from sql database:
+
+```python
+import dpbq
+
+dpbq.export_package(<storage>, 'descriptor.json')
+```
+
+### Tabular Storage
 
 To start using Google BigQuery service:
 - Create a new project - [link](https://console.developers.google.com/home/dashboard)
 - Create a service key - [link](https://console.developers.google.com/apis/credentials)
 - Download json credentials and set `GOOGLE_APPLICATION_CREDENTIALS` environment variable
 
-For example:
+We can get storage this way:
 
 ```python
+import io
 import os
+import json
 from apiclient.discovery import build
 from oauth2client.client import GoogleCredentials
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '.credentials.json'
 credentials = GoogleCredentials.get_application_default()
 service = build('bigquery', 'v2', credentials=credentials)
+project = json.load(io.open('.credentials.json', encoding='utf-8'))['project_id']
+storage = jtsbq.Storage(service, project, 'dataset')
 ```
 
 ### Design Overview
 
-#### Entities
+#### Storage & Drivers
 
-- Dataset
-
-    Table is a native BigQuery dataset. Dataset can contain tables.
-
-- Package
-
-    Package is a Data Package stored as Dataset on BigQuery. Resources
-    are stored as tables with directory separator `/` replaced by `__` (2 underscores).
-    Data Package structure can be restored from BigQuery dataset without
-    any knowledge about initial `datapackage.json`.
-
-> Package is a Data Package facade to Dataset (BigQuery) backend.
-
-Dataset and Package are geteways by their nature. It means user can initiate
-Dataset without real BigQuery dataset creation then call `create` or `delete` to
-delete the real datable without instance destruction.
+See jsontableschema layer [readme](https://github.com/okfn/jsontableschema-bigquery-py/tree/update#jsontableschema-bigquery-py).
 
 #### Mappings
 
 ```
 datapackage.json -> *not stored*
-datapackage.json resources -> BigQuery dataset's tables
-data/data.csv schema -> BigQuery talbe schema
-data/data.csv data -> BigQuery talbe data
+datapackage.json resources -> sql  tables
+data/data.csv schema -> sql table schema
+data/data.csv data -> sql table data
 ```
 
 #### Drivers
