@@ -23,7 +23,7 @@ import dpbq
 dpbq.import_package(<storage>, 'descriptor.json')
 ```
 
-Also we can export it from sql database:
+Also we can export it from bigquery database:
 
 ```python
 import dpbq
@@ -65,9 +65,9 @@ See jsontableschema layer [readme](https://github.com/okfn/jsontableschema-bigqu
 
 ```
 datapackage.json -> *not stored*
-datapackage.json resources -> sql  tables
-data/data.csv schema -> sql table schema
-data/data.csv data -> sql table data
+datapackage.json resources -> bigquery tables
+data/data.csv schema -> bigquery table schema
+data/data.csv data -> bigquery table data
 ```
 
 #### Drivers

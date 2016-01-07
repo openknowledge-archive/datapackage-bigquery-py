@@ -1,4 +1,6 @@
 -r requirements.txt
+google-api-python-client
+git+https://github.com/okfn/jsontableschema-bigquery-py.git
 pylama
 tox
 mock

@@ -1,7 +1,6 @@
 six
+jsontableschema
 
-# before tabulator on pypi
+# tabulator is datapackage-py dependency
 git+git://github.com/okfn/tabulator-py.git
-
 git+git://github.com/okfn/datapackage-py.git
-git+https://github.com/okfn/jsontableschema-bigquery-py.git

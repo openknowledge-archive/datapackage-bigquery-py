@@ -16,10 +16,7 @@ import jtsbq
 import dpbq
 
 
-def run(import_descriptor='examples/data/spending/datapackage.json',
-        export_descriptor='tmp/datapackage.json',
-        dataset='package_test',
-        prefix='test_'):
+def run(dataset, prefix, source, target):
 
     # Storage
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '.credentials.json'
@@ -28,23 +25,8 @@ def run(import_descriptor='examples/data/spending/datapackage.json',
     project = json.load(io.open('.credentials.json', encoding='utf-8'))['project_id']
     storage = jtsbq.Storage(service, project, dataset, prefix=prefix)
 
-    # Import
-    print('[Import]')
-    dpbq.import_package(
-           storage=storage,
-           descriptor=import_descriptor,
-           force=True)
-    print('imported')
+    # Import package
+    dpbq.import_package(storage, source)
 
-    # Export
-    print('[Export]')
-    dpbq.export_package(
-            storage=storage,
-            descriptor=export_descriptor)
-    print('exported')
-
-    return locals()
-
-
-if __name__ == '__main__':
-    run()
+    # Export package
+    dpbq.export_package(storage, target)

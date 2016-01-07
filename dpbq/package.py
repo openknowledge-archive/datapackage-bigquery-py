@@ -7,43 +7,53 @@ from __future__ import unicode_literals
 import io
 import os
 import re
+import csv
 import six
 import json
-import jtsbq
+from jsontableschema.model import SchemaModel
 from datapackage import DataPackage
 
 
 # Module API
 
-def import_package(storage, descriptor, force=False, default_base_path=None):
+def import_package(storage, descriptor):
     """Import Data Package to storage.
 
     Parameters
     ----------
     storage: object
         Storage object.
-    descriptor: dict/str
-        Data Package descriptor.
-    force: bool
-        Force table rewriting If it already exists.
-    default_base_path: str
-        If descriptor is not a path use it as base path.
+    descriptor: str
+        Path to descriptor.
 
     """
 
-    # Initiate model
-    model = DataPackage(descriptor, default_base_path=default_base_path)
+    # Init sets
+    tables = []
+    schemas = []
+    datamap = {}
 
-    # Create resources
+    # Init model
+    model = DataPackage(descriptor)
+
+    # Collect tables/schemas/data
     for resource in model.resources:
-
-        # Prepare parameters
         table = _convert_path(resource.metadata['path'])
         schema = resource.metadata['schema']
-        data = resource.local_data_path
+        data = resource.iter()
+        tables.append(table)
+        schemas.append(schema)
+        datamap[table] = data
 
-        # Import resource
-        jtsbq.import_resource(storage, table, schema, data, force=force)
+    # Create tables
+    for table in tables:
+        if storage.check(table):
+            storage.delete(table)
+    storage.create(tables, schemas)
+
+    # Write data to tables
+    for table in storage.tables:
+        storage.write(table, datamap[table])
 
 
 def export_package(storage, descriptor):
@@ -62,17 +72,31 @@ def export_package(storage, descriptor):
     resources = []
     for table in storage.tables:
 
-        # Export resource data
-        schema = {}
-        data = _restore_path(table)
-        data = os.path.join(os.path.dirname(descriptor), data)
-        jtsbq.export_resource(storage, table, schema, data)
+        # Prepare
+        schema = storage.describe(table)
+        base = os.path.dirname(descriptor)
+        path = _restore_path(table)
+        fullpath = os.path.join(base, path)
 
-        # Add resource metadata
-        metadata = {'schema': schema, 'path': data}
-        resources.append(metadata)
+        # Write data
+        _ensure_dir(fullpath)
+        with io.open(fullpath,
+                     mode=_write_mode,
+                     newline=_write_newline,
+                     encoding=_write_encoding) as file:
+            model = SchemaModel(schema)
+            data = storage.read(table)
+            writer = csv.writer(file)
+            writer.writerow(model.headers)
+            for row in data:
+                writer.writerow(row)
+
+        # Add resource
+        resource = {'schema': schema, 'path': path}
+        resources.append(resource)
 
     # Write descriptor
+    _ensure_dir(descriptor)
     with io.open(descriptor,
                  mode=_write_mode,
                  encoding=_write_encoding) as file:
@@ -90,11 +114,15 @@ _write_encoding = 'utf-8'
 if six.PY2:
     _write_encoding = None
 
+_write_newline = ''
+if six.PY2:
+    _write_newline = None
+
 
 def _convert_path(path):
     table = os.path.splitext(path)[0]
-    table = path.replace(os.path.sep, '__')
-    table = re.sub('[^0-9a-zA-Z_]+', '_', path)
+    table = table.replace(os.path.sep, '__')
+    table = re.sub('[^0-9a-zA-Z_]+', '_', table)
     return table
 
 
@@ -102,3 +130,9 @@ def _restore_path(table):
     path = table.replace('__', os.path.sep)
     path += '.csv'
     return path
+
+
+def _ensure_dir(path):
+    dirpath = os.path.dirname(path)
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
