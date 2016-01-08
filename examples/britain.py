@@ -13,9 +13,9 @@ from examples.base import run
 
 # Fixtures
 dataset = 'datapackage'
-prefix = 'spending_%s_%s_' % (sys.version_info.major, sys.version_info.minor)
-source = 'examples/packages/spending/datapackage.json'
-target = 'tmp/packages/spending/datapackage.json'
+prefix = 'britain_%s_%s_' % (sys.version_info.major, sys.version_info.minor)
+source = 'examples/packages/britain/datapackage.json'
+target = 'tmp/packages/britain/datapackage.json'
 
 
 # Execution
