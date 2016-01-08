@@ -34,12 +34,20 @@ class TestPackage(unittest.TestCase):
 
     # Tests
 
-    def test(self):
+    def test_spending(self):
 
         # Run function
         base.run(spending.dataset, spending.prefix, spending.source, self.target)
 
-        # Assert values
-        # TODO: implement assertions
-        actual = json.load(io.open(self.target, encoding='utf-8'))
-        expected = json.load(io.open(spending.source, encoding='utf-8'))
+        # Assert schemas
+        source = json.load(io.open(spending.source, encoding='utf-8'))
+        target = json.load(io.open(self.target, encoding='utf-8'))
+        assert source == target
+
+        # Assert data
+        for source, target in zip(source['resources'], target['resources']):
+            spath = os.path.join(os.path.dirname(spending.source), source['path'])
+            tpath = os.path.join(os.path.dirname(self.target), target['path'])
+            source = io.open(spath, encoding='utf-8').read()
+            target = io.open(tpath, encoding='utf-8').read()
+            assert source == target

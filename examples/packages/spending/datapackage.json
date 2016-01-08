@@ -5,20 +5,20 @@
             "schema": {
                 "fields": [
                     {
-                        "type": "string",
-                        "name": "id"
+                        "name": "id",
+                        "type": "string"
                     },
                     {
-                        "type": "string",
-                        "name": "name"
+                        "name": "name",
+                        "type": "string"
                     },
                     {
-                        "type": "string",
-                        "name": "description"
+                        "name": "description",
+                        "type": "string"
                     },
                     {
-                        "type": "number",
-                        "name": "amount"
+                        "name": "amount",
+                        "type": "number"
                     }
                 ]
             }
