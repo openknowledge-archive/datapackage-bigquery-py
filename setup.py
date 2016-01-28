@@ -16,11 +16,19 @@ def read(path):
     return io.open(os.path.join(basedir, path), encoding='utf-8').read()
 
 
+def clean(deps):
+    res = []
+    for dep in deps:
+        if dep and not dep.startswith('#') and not dep.startswith('git') and not dep.startswith('-r'):
+            res.append(dep)
+    return res
+
+
 # Prepare
 readme = read('README.md')
 license = read('LICENSE.txt')
-requirements = read('requirements.txt').split()
-requirements_dev = read('requirements.dev.txt').split()
+requirements = clean(read('requirements.txt').splitlines())
+requirements_dev = clean(read('requirements.dev.txt').splitlines())
 package = json.loads(read('package.json'))
 
 
