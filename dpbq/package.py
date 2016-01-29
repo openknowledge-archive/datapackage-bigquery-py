@@ -181,5 +181,5 @@ def _restore_resources(mapping, resources):
 
 def _ensure_dir(path):
     dirpath = os.path.dirname(path)
-    if not os.path.exists(dirpath):
+    if dirpath and not os.path.exists(dirpath):
         os.makedirs(dirpath)
