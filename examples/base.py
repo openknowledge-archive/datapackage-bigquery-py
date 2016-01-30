@@ -27,6 +27,8 @@ def run(dataset, prefix, source, target):
 
     # Import package
     dpbq.import_package(storage, source)
+    print('Imported datapackage from "%s"' % source)
 
     # Export package
     dpbq.export_package(storage, target)
+    print('Exported datapackage to "%s"' % target)
