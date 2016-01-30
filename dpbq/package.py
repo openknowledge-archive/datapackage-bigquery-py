@@ -6,13 +6,13 @@ from __future__ import unicode_literals
 
 import io
 import os
-import re
 import csv
-import six
 import json
 from copy import deepcopy
 from jsontableschema.model import SchemaModel
 from datapackage import DataPackage
+
+from . import helpers
 
 
 # Module API
@@ -41,7 +41,7 @@ def import_package(storage, descriptor):
     # Collect tables/schemas/data
     for resource in model.resources:
         name = resource.metadata.get('name', None)
-        table = _convert_path(resource.metadata['path'], name)
+        table = helpers.convert_path(resource.metadata['path'], name)
         schema = resource.metadata['schema']
         data = resource.iter()
         tables.append(table)
@@ -49,7 +49,7 @@ def import_package(storage, descriptor):
         datamap[table] = data
         if name is not None:
             mapping[name] = table
-    schemas = _convert_schemas(mapping, schemas)
+    schemas = helpers.convert_schemas(mapping, schemas)
 
     # Create tables
     for table in tables:
@@ -82,17 +82,17 @@ def export_package(storage, descriptor):
         # Prepare
         schema = storage.describe(table)
         base = os.path.dirname(descriptor)
-        path, name = _restore_path(table)
+        path, name = helpers.restore_path(table)
         fullpath = os.path.join(base, path)
         if name is not None:
             mapping[table] = name
 
         # Write data
-        _ensure_dir(fullpath)
+        helpers.ensure_dir(fullpath)
         with io.open(fullpath,
-                     mode=_write_mode,
-                     newline=_write_newline,
-                     encoding=_write_encoding) as file:
+                     mode=helpers.WRITE_MODE,
+                     newline=helpers.WRITE_NEWLINE,
+                     encoding=helpers.WRITE_ENCODING) as file:
             model = SchemaModel(deepcopy(schema))
             data = storage.read(table)
             writer = csv.writer(file)
@@ -107,79 +107,10 @@ def export_package(storage, descriptor):
         resources.append(resource)
 
     # Write descriptor
-    resources = _restore_resources(mapping, resources)
-    _ensure_dir(descriptor)
+    resources = helpers.restore_resources(mapping, resources)
+    helpers.ensure_dir(descriptor)
     with io.open(descriptor,
-                 mode=_write_mode,
-                 encoding=_write_encoding) as file:
+                 mode=helpers.WRITE_MODE,
+                 encoding=helpers.WRITE_ENCODING) as file:
         descriptor = {'resources': resources}
         json.dump(descriptor, file, indent=4)
-
-
-# Internal
-
-_write_mode = 'w'
-if six.PY2:
-    _write_mode = 'wb'
-
-_write_encoding = 'utf-8'
-if six.PY2:
-    _write_encoding = None
-
-_write_newline = ''
-if six.PY2:
-    _write_newline = None
-
-
-def _convert_path(path, name):
-    table = os.path.splitext(path)[0]
-    table = table.replace(os.path.sep, '__')
-    table = re.sub('[^0-9a-zA-Z_]+', '_', table)
-    if name is not None:
-        table = '___'.join([table, name])
-    return table
-
-
-def _restore_path(table):
-    name = None
-    splited = table.split('___')
-    path = splited[0]
-    if len(splited) == 2:
-        name = splited[1]
-    path = path.replace('__', os.path.sep)
-    path += '.csv'
-    return path, name
-
-
-def _convert_schemas(mapping, schemas):
-    for schema in schemas:
-        for fk in schema.get('foreignKeys', []):
-            resource = fk['reference']['resource']
-            if resource != 'self':
-                if resource not in mapping:
-                    message = (
-                        'Resource "%s" for foreign key "%s" '
-                        'doesn\'t exist.' % (resource, fk))
-                    raise ValueError(message)
-                fk['reference']['resource'] = '<table>'
-                fk['reference']['table'] = mapping[resource]
-    return schemas
-
-
-def _restore_resources(mapping, resources):
-    for resource in resources:
-        schema = resource['schema']
-        for fk in schema.get('foreignKeys', []):
-            fkresource = fk['reference']['resource']
-            if fkresource == '<table>':
-                table = fk['reference']['table']
-                _, name = _restore_path(table)
-                del fk['reference']['table']
-                fk['reference']['resource'] = name
-    return resources
-
-
-def _ensure_dir(path):
-    dirpath = os.path.dirname(path)
-    if dirpath and not os.path.exists(dirpath):
-        os.makedirs(dirpath)

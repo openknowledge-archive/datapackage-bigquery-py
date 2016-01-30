@@ -16,7 +16,7 @@ import unittest
 
 
 from examples import base
-from examples import spending
+from examples import testing
 
 
 class TestPackage(unittest.TestCase):
@@ -34,19 +34,19 @@ class TestPackage(unittest.TestCase):
 
     # Tests
 
-    def test_spending(self):
+    def test_testing(self):
 
         # Run function
-        base.run(spending.dataset, spending.prefix, spending.source, self.target)
+        base.run(testing.dataset, testing.prefix, testing.source, self.target)
 
         # Assert schemas
-        source = json.load(io.open(spending.source, encoding='utf-8'))
+        source = json.load(io.open(testing.source, encoding='utf-8'))
         target = json.load(io.open(self.target, encoding='utf-8'))
         assert source == target
 
         # Assert data
         for source, target in zip(source['resources'], target['resources']):
-            spath = os.path.join(os.path.dirname(spending.source), source['path'])
+            spath = os.path.join(os.path.dirname(testing.source), source['path'])
             tpath = os.path.join(os.path.dirname(self.target), target['path'])
             source = io.open(spath, encoding='utf-8').read()
             target = io.open(tpath, encoding='utf-8').read()
